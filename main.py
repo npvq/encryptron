@@ -4,8 +4,8 @@
 #                                   #
 #####################################
 #
-# Ver: 1.0.0-b.1
-version = "Version 1.0.0-beta.1"
+# Ver: 0.1-b
+version = "Version 0.1-beta"
 # Author: npvq
 # 2021-08-25
 #

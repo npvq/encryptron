@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Encryptron Installer Script
-VERSION="v1.0.0-beta.1"
+VERSION="v0.1-beta"
 
 # SYNOPSIS:
 # Clearly displays paths and target paths to all package scripts
