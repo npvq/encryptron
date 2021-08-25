@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Encryptron Installer Script v1.0.0-a.1
-# Updated 2021-08-24
+# Encryptron Installer Script
+VERSION="v1.0.0-alpha.1"
 
 # SYNOPSIS:
 # Clearly displays paths and target paths to all package scripts
@@ -82,8 +82,7 @@ echo
 echo "Initializing Installation Wizard..."
 printf "${tput_civis}"
 echo
-iter_task
-echo "Sourcing Package Settings... ${task}"
+iter_task; echo "Sourcing Package Settings... ${task}"
 if [ ! -f "${src_dir}/.scripts/package_settings.sh" ]; then
     install_error "Could not find package settings: ${src_dir}/.scripts/package_settings.sh"
 fi
@@ -91,8 +90,7 @@ fi
 source "${src_dir}/.scripts/package_settings.sh"
 echo "Sourced settings from ${src_dir}/.scripts/package_settings.sh"
 echo
-iter_task
-echo "Checking Python Version... ${task}"
+iter_task; echo "Checking Python Version... ${task}"
 
 # see: https://stackoverflow.com/a/16817744/14387133 (sed)
 pyversion=$(/usr/bin/env python3 -V 2>&1 | sed "s/^.*Python \([0-9.]*\).*/\1/")
@@ -116,8 +114,7 @@ else
 fi
 
 echo
-iter_task
-echo "Locating Scripts... ${task}"
+iter_task; echo "Locating Scripts... ${task}"
 
 # Locate directory, then check if each file exists
 if [ -d "${src_dir}/.scripts/" ]; then
@@ -138,22 +135,24 @@ do
 done
 
 echo
-iter_task
-echo "Loading Logo... ${task}"
+iter_task; echo "Loading Logo... ${task}"
 wait_time
 
 if [ -f "${src_dir}/.scripts/helper/printlogo.py" ]; then
     clear
     /usr/bin/env python3 "${src_dir}/.scripts/helper/printlogo.py" 5
+    echo
+    echo "Version: ${VERSION}"
     sleep 2 # appreciate the beauty
 else
     echo "Could not locate logo script: ${src_dir}/.scripts/helper/printlogo.py ..."
     install_warn "Logo script not found, continuing anyway."
+    echo
+    echo "Version: ${VERSION}"
 fi
 
 # traditionally here is the point to ask for Sudo, but we'll see if we can postpone it.
 
-echo
 echo
 echo -e "${tput_smul}Scripts are ready. Proceed with installation? (y/n)${tput_rmul}"
 printf "${italic}Scripts will be installed to ${tput_smul}${target_dir}${tput_reset}"
@@ -165,8 +164,7 @@ if [ "$yesnores" = "0" ]; then
     exit 1
 fi
 
-iter_task
-echo "Checking Target Directory... ${task}"
+iter_task; echo "Checking Target Directory... ${task}"
 
 if [ -d "$target_dir" ]; then
     echo "Target directory located: ${target_dir}"
@@ -177,8 +175,7 @@ else
 fi
 
 echo
-iter_task
-echo "Installing Scripts... ${task}"
+iter_task; echo "Installing Scripts... ${task}"
 
 for file in "${script_files[@]}"
 do
@@ -193,14 +190,12 @@ do
 done
 
 echo
-iter_task
-echo "Adding Executable Permissions to ${script}... ${task}"
+iter_task; echo "Adding Executable Permissions to ${script}... ${task}"
 chmod a+x "${target_dir}/${script}" # pray that this doesn't require sudo... I'll assume it doesn't. It's in your own home directory
 echo -e "Done $(checkmark)"
 
 echo
-iter_task
-echo "Creating Symlink... ${task}"
+iter_task; echo "Creating Symlink... ${task}"
 if [ -L "${symlink_path}/${script}" ] || [ -e "${symlink_path}/${script}" ]; then  # -e: exists as any type: file or symlink
     install_warn "The file ${symlink_path}/${script} already exists."
     echo "If you are updating or reinstalling Encryptron, then enter 'y' to proceed to overwrite the current symlink."

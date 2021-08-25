@@ -25,7 +25,7 @@ The file structure of the Disk Image is as follows:
 - The `.assets` directory containing art/icons (and background image) for the install drive
 - The `.scripts` directory containing all the scripts to be installed.
     - There is a special subfolder called `helper` containing scripts that will only be used during the installation process. This is mostly so that I don't mix up which scripts I need to copy.
-- And the `.fseventd` directory because MacOS loves it so much
+- And the `.fseventsd` directory because MacOS loves it so much
 
 ### How to package
 
@@ -37,7 +37,7 @@ Update: Packaging has now been made easier with the advent of a new packaging sc
 
 The only locations in which the version number is present are
 - At the top of `main.py`
-- In a comment at the top of `install`
+- At the top of `install`
 - And in `README.txt`
 
 # TODOS
