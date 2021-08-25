@@ -4,10 +4,10 @@
 #                                   #
 #####################################
 #
-# Ver: 1.0.0-a.1
-version = "Version 1.0.0-alpha.1"
+# Ver: 1.0.0-b.1
+version = "Version 1.0.0-beta.1"
 # Author: npvq
-# 2021-08-24
+# 2021-08-25
 #
 
 from sys import argv, exit

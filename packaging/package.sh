@@ -33,6 +33,7 @@ read -n 1 -r
 
 echo "Deleting the following files..."
 
+# find "${ppath}" -name '.DS_Store' -type f -delete # can't do that, breaks style formatting
 find "${ppath}/.assets" ! -name 'Icon?' -type f -exec rm -v {} +
 find "${ppath}/.scripts" ! -name 'Icon?' -type f -exec rm -v {} +
 find "${ppath}/.fseventsd" ! -name 'Icon?' -type f -exec rm -v {} +

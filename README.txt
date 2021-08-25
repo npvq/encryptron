@@ -5,13 +5,15 @@
 ██╔═╝  ██║╚████║██║    ██╔══██╗ ╚██╔╝  ██╔═══╝   ██║  ██╔══██╗██║  ██║██║╚████║
 ██████╗██║ ╚███║╚█████╗██║  ██║  ██║   ██║       ██║  ██║  ██║╚█████╔╝██║ ╚███║
 ╚═════╝╚═╝  ╚══╝ ╚════╝╚═╝  ╚═╝  ╚═╝   ╚═╝       ╚═╝  ╚═╝  ╚═╝ ╚════╝ ╚═╝  ╚══╝
-         .      ___/     ___/                 .
- _   __ /|    .'  /\   .'  /\         ___    /|
- |   /   |    |  / |   |  / | .---'  /   `    |
- `  /    |    |,'  |   |,'  |       |    |    |
-  \/    _|_ / /`---' / /`---'       `.__/| / _|_
-
-(v1.0.0-alpha.1, revised 2021-08-24)
+ _        ___         ___             ___        _
+/ |      / _ \       / _ \           / _ \      / |
+- |     | | | |     | | | |  _____  | |_) )     - |
+| |     | | | |     | | | | (_____) |  _ <      | |
+| |  _  | |_| |  _  | |_| |         | |_) )  _  | |
+|_| (_)  \___/  (_)  \___/          |  __/  (_) |_|
+                                    | |
+                                    |_|
+(v1.0.0-beta.1, revised 2021-08-25)
 
 Instructions:
 
@@ -97,8 +99,10 @@ Technical Details:
 - NOTE: This is a pre-release developmental version of the script. Also, as of
   this version, there is no package management system for this project.
 
-We hope you enjoy, and should you encounter any installation issues or bugs
-please reach out to be at 𝒫robably#1729 (discord), thanks,
+We hope you enjoy, and should you encounter any installation issues, bugs, or
+feature requests, please visit our github page:
+
+                     https://github.com/npvq/encryptron
   __
  /  `                       _/_
 /--  ____  _. __  __  , _   /  __  __ ____
