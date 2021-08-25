@@ -1,0 +1,256 @@
+#!/bin/bash
+
+# Encryptron Installer Script v1.0.0-a.1
+# Updated 2021-08-24
+
+# SYNOPSIS:
+# Clearly displays paths and target paths to all package scripts
+# Does not display paths to helper scripts unless necessary
+
+# predefined TPUT
+tput_bold="$(tput bold)"
+tput_rev="$(tput rev)" # reverse
+italic="\033[3m"
+tput_smul="$(tput smul)" # underline
+tput_rmul="$(tput rmul)" # stop underline
+tput_red="$(tput setaf 1)"
+tput_green="$(tput setaf 2)"
+tput_yellow="$(tput setaf 3)"
+tput_reset="$(tput sgr0)"
+
+tput_civis="$(tput civis)" # cursor invisible
+tput_cnorm="$(tput cnorm)" # cursor normal
+
+# Here for a flexible, potential implementation of a task bar
+total_tasks=8
+__cur_task=0
+
+function iter_task() {
+    wait_time
+    ((__cur_task++))
+    task="$(tput rev) (${__cur_task}/${total_tasks}) ${tput_reset}"
+    if [ "$__cur_task" -gt "$total_tasks" ]; then
+        echo "WARNING: TOTAL_TASKS CONST IS INACCURATE."
+    fi
+}
+function wait_time() { # adjustable slow down rate
+    sleep 0.2 # replace with : if need empty
+}
+# Useful Paths
+#src_dir="$(dirname $0)" # we'll try to be more universal
+# see: https://stackoverflow.com/a/4774063/14387133
+src_dir="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+# echo $src_dir
+# xxx target_dir="${HOME}/.config/${proj_name}" # hides in .config, more "modest"
+# target_dir is now sourced form .scripts/package_settings.sh
+# proj_name="encryptron" # name of project (directory name) # unnecessary
+
+symlink_path="/usr/local/bin"
+script="crypt" # name of script (when accessed in CLI PATH)
+
+# Error Reporting Function
+function install_error() {
+    echo -e "${tput_bold}${tput_red}Installation Error: ${1} ✗${tput_reset}";
+    exit 1
+}
+function install_warn() {
+    echo -e "${tput_yellow}${italic}Installation Warning: ${1} ⚠${tput_reset}";
+}
+# Shorthand
+function checkmark {
+    printf "${tput_bold}${tput_green}✓${tput_reset}";
+}
+
+# Read input (y/n):
+__inch_left="$(tput cub 1)"
+function readyesno() {
+    # see: https://www.shellhacks.com/yes-no-bash-script-prompt-confirmation/
+    tput setaf 0; tput setab 0; # set both to black -> invisible
+    while true; do
+        read -n 1 -r
+        case $REPLY in
+            [Yy] ) yesnores="1"; printf "${__inch_left}${tput_reset} \n"; break;;
+            [Nn] ) yesnores="0"; printf "${__inch_left}${tput_reset} \n"; break;;
+        esac
+        printf "${__inch_left}"
+    done
+}
+
+
+# START OF PROGRAM
+echo
+echo "Initializing Installation Wizard..."
+printf "${tput_civis}"
+echo
+iter_task
+echo "Sourcing Package Settings... ${task}"
+if [ ! -f "${src_dir}/.scripts/package_settings.sh" ]; then
+    install_error "Could not find package settings: ${src_dir}/.scripts/package_settings.sh"
+fi
+# Lists of scripts to migrate: script_files. Sourced from .scripts/package_settings.sh
+source "${src_dir}/.scripts/package_settings.sh"
+echo "Sourced settings from ${src_dir}/.scripts/package_settings.sh"
+echo
+iter_task
+echo "Checking Python Version... ${task}"
+
+# see: https://stackoverflow.com/a/16817744/14387133 (sed)
+pyversion=$(/usr/bin/env python3 -V 2>&1 | sed "s/^.*Python \([0-9.]*\).*/\1/")
+#| grep -Po '(?<=Python )(.+)')
+if [ -z "$pyversion" ]
+then
+    install_error "No Python distribution found."
+fi
+
+# see: https://stackoverflow.com/a/33183884/14387133
+parsed_pyversion=$(echo "${pyversion//./}")
+
+# Debug
+# echo "$parsed_pyversion"
+
+if [ "$parsed_pyversion" -gt "359" ]  # accepts Python 3.6 or above
+then
+    echo "Accepted Python distribution found: ${pyversion} (Required: >=3.6)"
+else
+    install_error "Accepted Python distribution not found. (Version: ${pyversion}, Required: >=3.6)"
+fi
+
+echo
+iter_task
+echo "Locating Scripts... ${task}"
+
+# Locate directory, then check if each file exists
+if [ -d "${src_dir}/.scripts/" ]; then
+    echo "Scripts directory found: ${src_dir}/.scripts/ $(checkmark)"
+else
+    echo "Script directory could not be found: ${src_dir}/.scripts/ ..."
+	install_error "Scripts directory not found."
+fi
+
+for file in "${script_files[@]}"
+do
+    if [ -f "${src_dir}/.scripts/${file}" ]; then
+        echo "Located Script: ${src_dir}/.scripts/${file} $(checkmark)"
+    else
+        echo "Script could not be found: ${src_dir}/.scripts/${file} ..."
+        install_error "Script not found."
+    fi
+done
+
+echo
+iter_task
+echo "Loading Logo... ${task}"
+wait_time
+
+if [ -f "${src_dir}/.scripts/helper/printlogo.py" ]; then
+    clear
+    /usr/bin/env python3 "${src_dir}/.scripts/helper/printlogo.py" 5
+    sleep 2 # appreciate the beauty
+else
+    echo "Could not locate logo script: ${src_dir}/.scripts/helper/printlogo.py ..."
+    install_warn "Logo script not found, continuing anyway."
+fi
+
+# traditionally here is the point to ask for Sudo, but we'll see if we can postpone it.
+
+echo
+echo
+echo -e "${tput_smul}Scripts are ready. Proceed with installation? (y/n)${tput_rmul}"
+printf "${italic}Scripts will be installed to ${tput_smul}${target_dir}${tput_reset}"
+readyesno
+if [ "$yesnores" = "0" ]; then
+    echo
+    echo -e "${tput_bold}${tput_red}Installation Aborted, Terminating Script...${tput_reset}"
+    printf "${tput_cnorm}"
+    exit 1
+fi
+
+iter_task
+echo "Checking Target Directory... ${task}"
+
+if [ -d "$target_dir" ]; then
+    echo "Target directory located: ${target_dir}"
+else
+    echo "Target directory not found..."
+    echo "Creating target directory: ${target_dir}"
+    mkdir -p "$target_dir"
+fi
+
+echo
+iter_task
+echo "Installing Scripts... ${task}"
+
+for file in "${script_files[@]}"
+do
+    if [ ! -d "$(dirname ${target_dir}/${file})" ]; then
+        echo -e "Creating subdirectory: $(dirname ${target_dir}/${file})..."
+        mkdir -p "$(dirname ${target_dir}/${file})"
+    fi
+    if [ -f "${target_dir}/${file}" ]; then
+        install_warn "The file ${target_dir}/${file} and will be ${tput_bold}${tput_smul}Overwritten${tput_rmul}"
+    fi
+    cp -v "${src_dir}/.scripts/${file}" "${target_dir}/${file}"
+done
+
+echo
+iter_task
+echo "Adding Executable Permissions to ${script}... ${task}"
+chmod a+x "${target_dir}/${script}" # pray that this doesn't require sudo... I'll assume it doesn't. It's in your own home directory
+echo -e "Done $(checkmark)"
+
+echo
+iter_task
+echo "Creating Symlink... ${task}"
+if [ -L "${symlink_path}/${script}" ] || [ -e "${symlink_path}/${script}" ]; then  # -e: exists as any type: file or symlink
+    install_warn "The file ${symlink_path}/${script} already exists."
+    echo "If you are updating or reinstalling Encryptron, then enter 'y' to proceed to overwrite the current symlink."
+    echo "Depending on your system you may need to enter your password." # see https://unix.stackexchange.com/a/158492/483139
+    echo -e "${tput_smul}More Info:${tput_rmul}"
+    file "${symlink_path}/${script}"
+    echo
+    echo -e "${tput_smul}Would you like to overwrite the file?${tput_rmul}"
+    echo
+    echo -e "\t(y) Overwrite the current file at ${symlink_path}/${script}"
+    echo -e "\t(n) Do not overwrite. Encryptron will not be accessible via path."
+    readyesno
+    if [ "$yesnores" = "1" ]; then
+        echo
+        [ -w "$symlink_path" ] && rm ${symlink_path}/${script} || sudo rm ${symlink_path}/${script}
+        echo "File ${symlink_path}/${script} was removed."
+        echo "Creating Symlink..."
+        [ -w "$symlink_path" ] && ln -vs "${target_dir}/${script}" "${symlink_path}/${script}" || sudo ln -vs "${target_dir}/${script}" "${symlink_path}/${script}"
+    else
+        echo "Skipping Symlink..."
+    fi
+else
+    echo "Depending on your system you may need to enter your password."
+    [ -w "$symlink_path" ] && ln -vs "${target_dir}/${script}" "${symlink_path}/${script}" || sudo ln -vs "${target_dir}/${script}" "${symlink_path}/${script}"
+    echo "Symlink has been created."
+fi
+
+echo
+echo
+echo -e "${tput_bold}${tput_green}INSTALLATION COMPLETE ✓${tput_reset}"
+echo -e "If the symlink was successfully created, then you can try out Encryptron by refreshing PATH and using the command ${tput_rev} crypt ${tput_reset}"
+
+printf "$tput_cnorm"
+
+exit 0 # END OF SCRIPT
+
+# Archivial Code:
+
+# # Asks for sudo permission
+# echo "Enter your password to authorize this installation (secure, handled by OS)"
+# # sudo echo "test" > /dev/null
+# sudo touch /tmp/.sudo-test-file
+# echo
+# if [ ! -f /tmp/.sudo-test-file ]; then
+# 	tput bold; tput setaf 1; echo "Installation Error: Failed to get permissions. ✗"; tput sgr0
+# 	exit 1
+# fi
+# sudo rm /tmp/.sudo-test-file
+
+# sudo ln -s "${HOME}/.config/${proj_name}/script" /usr/local/bin/dse
+#
+# tput bold; echo "Installation Complete $(tput setaf 2)✓"; tput sgr0
+# exit 0

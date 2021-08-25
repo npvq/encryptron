@@ -1,0 +1,176 @@
+list
+List of Commands:
+
+ check-key – Checks what hex permutation to which a key corresponds
+             (shortcut: ckey)
+check-perm – Checks whether a hex permutation is valid (shortcut: p)
+      copy – Displays or sets Clipboard Mode
+    decode – Decodes whitespace crypt into text (shortcut: x)
+    encode – Encodes text into whitespace crypt (shortcut: e)
+      exit – Exits the terminal (shortcut: x)
+      help – Displays documentation for a specific command.
+  tutorial – Displays a synopsis of the terminal using 'less'.
+
+%%%%%%%%%%
+tutorial
+tutorial  (no arguments)
+Displays a synopsis of the terminal using 'less'.
+%%%%%%%%%%
+help
+~>help <command>
+Displays documentation for a give command, if any.
+
+help list
+Displays a list of commands.
+%%%%%%%%%%
+exit,x
+~>exit  (no arguments)
+~>x     (no arguments)
+Exits the terminal session.
+%%%%%%%%%%
+history
+history
+Displays recent history. Will display 20 entries by default. If two consecutive
+commands are identical, the latter will not be recorded into session history.
+
+history [search [search ...]]
+Searches full history for any number of space-separated search terms.
+
+USING HISTORY
+There are a few special commands in this terminal. The command '!!' will
+directly execute the previous command, and the '!n' command, where 'n' is an
+integer, will execute the n-th history command. The commands are numbered the
+same way as they appear in the history search.
+%%%%%%%%%%
+copy
+~>copy
+Displays status of Clipboard Mode (On/Off)
+
+~>copy [on/1/true/off/0/false]
+Sets Clipboard Mode to True of False. Arguments of value 'on', '1', or 'true'
+will all register as True, and arguments of 'off', '0', or 'false' will all
+register as False. The argument is case-insensitive. Clipboard Mode is set to
+Off by default, and cannot be turned on unless the package 'pyperclip' is
+successfully imported. Install 'pyperclip' via
+'python3 -m pip install pyperclip'
+%%%%%%%%%%
+ckey,check-key
+~>check-key <key> [cc]
+~>ckey <key> [cc]
+Returns the hex permutation to which a key corresponds. If the key contains the
+space character, use backslash to escape the space or put the key inside double
+quotes. To use the double quote (") and the backslash (\) in a key you must
+escape it first by prefixing another backslash to it. You can use special
+characters like '\n' in a key.
+
+MECHANISM OF KEYS
+Each character of the key acts on the permutation as follows: the hexadecimal
+digit represented by the first four binary digits of the ascii value of said
+character and the hex digit that is represented by the latter four binary
+digits will be swapped (transposed). Hence, a character whose value's first
+four binary digits is equal to their latter four binary digits, i.e. is a
+multiple of 17, has no effect on the permutation whatsoever. However, each
+subsequent character of the key will be shifted by an addition 41 in an effort
+to prevent insecure or defective keys. So the 17-divisible rule only applies
+to the first letter.
+
+Tip: to get a list of such 17-divisible keys, the list:
+[chr(a) for a in range(256) if a % 17 == 0]
+will yield the following characters in python:
+'\x00', '\x11', '"', '3', 'D', 'U', 'f', 'w', '\x88', '\x99', 'ª', '»',
+'Ì', 'Ý', 'î', 'ÿ'
+
+DEFECTIVE KEYS
+A key is called defective if its corresponding permutation is the (default)
+identity permutation. Using a defective key is the same as not using a key.
+Keys using 17-divisible ascii characters are not the only defective keys. For
+instance, consider a key that consists of any single ascii character an even
+number of times. You will be warned if a checked key is defective.
+
+COPY RESULT TOKEN
+When Clipboard Mode is On, adding the token 'cc' to the end of an encoding
+command given that the required [key] positional argument is satisfied will
+cause the result to be copied to your clipboard in addition to being diplayed
+in the terminal.
+
+All of the above also applies the positional key argument taken by the encode
+and decode commands
+%%%%%%%%%%
+p,check-perm
+~>check-perm <perm>
+~>p <perm>
+Returns whether a hex permutation is valid. A hex permutation is a sequence of
+non-space-separated hexadecimal numbers (0,1,...,9,a,...,f) that describe the
+change to the indices of a 16-element list after a permutation has been
+applied to it. This permutation needs to contain each of 0,1,...,9,a,...,f
+exactly once, and thus have length 16, in order for the concept to make sense.
+
+The permutations are implicitly checked before being applied to codecs during
+both key and permutation encryption.
+%%%%%%%%%%
+encode,e
+~>encode <key> [-f=[filter]] <message [message ...]> [cc]
+~>e <key> [-f=[filter]] <message [message ...]> [cc]
+Encodes text using the whitespace codec.
+
+KEYS
+The positional argument containing the [key] is mandatory. To not use a key,
+enter in any single letter that makes a defective key (see 'help check-key')
+Easy-to-type single-lettered defective keys include '3', 'D', 'U', 'f', 'w'.
+(case sensitive) If a key is not used, the command will display (NO KEY) at the
+top left corner of the output.
+Tip: it is also a good idea to keep in mind that the addition and removal of
+these characters from any key does not change the key's value.
+
+FILTERS
+A filter ensures that the encoded crypt does not exhibit patterns present
+within the text. The key is static, so it provides the user security with or
+against other users of this codec. However, it does not protect against
+frequency analysis and other cracking techniques from the outside. The filter
+adds a easily reconstructable number that "misaligns" the codec during
+encoding and decoding. It is meant to thwart rudimentary attempts at cracking.
+
+By default, the Tribonacci numbers are used as a filter (for no reason in
+particular, other than that they are easy to generate). By using the
+'-f=<filter name>' flag right after the key, the filter used can be changed.
+The other options are the Fibonacci and Lucas numbers. You do not have to type
+the entire string as the command will match prefixes with the names of the
+filters to determine which one to use. The filter search is case-insensitive.
+
+MESSAGE
+The message is the text that is encoded. It does not need to be quoted, but
+quoting can reduce the amount of errors and possibility of unexpected behavior.
+When it is not quoted, consecutive spaces are all reduced to single spaces.
+When Clipboard Mode is On, not entering a message will cause the command to
+fetch the content on the clipboard as input.
+
+COPY RESULT TOKEN
+When Clipboard Mode is On, adding the token 'cc' to the end of an encoding
+command given that the required [key] positional argument is satisfied will
+cause the result to be copied to your clipboard in addition to being diplayed
+in the terminal.
+
+~>encode wp <perm> [-f=[filter]] <message [message ...]> [cc]
+~>e wp <perm> [-f=[filter]] <message [message ...]> [cc]
+Encodes text using the whitespace codec with permutation (wp) instead of using
+a key. Since 'w' is a 17-divisible character, the key 'wp' is equivalent to the
+key 'p', hence the designation of 'wp' for permutations does not hinder an
+effective key. The rest of the arguments work in the same way as above.
+%%%%%%%%%%
+decode,d
+~>decode <key> [-f=[filter]] <crypt> [cc]
+~>d <key> [-f=[filter]] <crypt> [cc]
+Decodes to text using the whitespace codec.
+(See 'help encode'). The key, filter, and copy result token work in the same
+way as detailed in 'help encode'. Due to spaces being an important part of the
+whitespace codec and the whitespace insensitivity of this terminal, it is hence
+required that the crypt be encapsulated in double quotes. Failure to do so
+will most likely cause decryption to fail. When Clipboard Mode is On, not
+entering the crypt will cause the command to fetch the content on the clipboard
+as input.
+
+~>decode wp <perm> [-f=[filter]] <crypt> [cc]
+~>d wp <perm> [-f=[filter]] <crypt> [cc]
+Decodes to text using the whitespace codec with permutation (wp) instead of
+using a key. This works in the same way as 'encode wp'.
+%%%%%%%%%%

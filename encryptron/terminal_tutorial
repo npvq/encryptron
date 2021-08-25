@@ -1,0 +1,123 @@
+__________                                   _____
+___  ____/________________________  ___________  /____________________
+__  __/  __  __ \  ___/_  ___/_  / / /__  __ \  __/_  ___/  __ \_  __ \
+_  /___  _  / / / /__ _  /   _  /_/ /__  /_/ / /_ _  /   / /_/ /  / / /
+/_____/  /_/ /_/\___/ /_/    _\__, / _  .___/\__/ /_/    \____//_/ /_/
+                             /____/  /_/
+                 ____ ____ ____ ____ ____ ____ ____ ____
+                ||T |||e |||r |||m |||i |||n |||a |||l ||
+                ||__|||__|||__|||__|||__|||__|||__|||__||
+                |/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|
+
+Guide to the Encryptron Terminal
+
+1. Why another terminal?
+This terminal uses a simplified format that works more efficiently if you
+need to enter multiple commands.
+
+2. How does this work?
+You make queries to the script in a similar way as you would the script from
+the terminal itself. However, a simplified and consistent format here allows
+you to skip many tedious steps, especially with keyword arguments.
+
+                                               )
+                (            (   (          ( /((
+                )\   (     ( )(  )\ ) `  )  )\())(   (   (
+               ((_)  )\ )  )(()\(()/( /(/( (_))(()\  )\  )\ )
+               | __|_(_/( ((_|(_))(_)|(_)_\| |_ ((_)((_)_(_/(
+               | _|| ' \)) _| '_| || | '_ \)  _| '_/ _ \ ' \))
+               |___|_||_|\__|_|  \_, | .__/ \__|_| \___/_||_|
+                                 |__/|_|
+                  ____ ____ ____ ____ ____ ____ ____ ____
+                 ||T |||u |||t |||o |||r |||i |||a |||l ||
+                 ||__|||__|||__|||__|||__|||__|||__|||__||
+                 |/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|
+
+There are two essential operations that Encryptron is used for:
+encoding text and decoding crypts. These are designated the one letter commands
+'e' and 'd' respectively. In this syntax, a 'command' refers to the first 'word'
+(in a space-separated input line) of a query.
+
+After that, you need to specify the key. A single-character input that has no
+effect on the codec permutation when used as a key will be interpreted as
+"NO KEY". These characters, including but not limited to (case sensitive):
+'"', '3', 'D', 'U', 'f', 'w', are used for such purposes as if they were
+themselves used as keys, they would have no effect on the resulting output,
+making it same as if there were no key. Since any of the preceding keys work,
+pick the one that is easiest to type and/or remember for you.
+
+Alternatively, if you wish to directly specify a permutation, you may do so by
+passing in the flag 'wp'. You could interpret this to stand for 'with
+permutation', but it really is just defined as such for the slot occupied by
+this flag is for key inputting and 'w' does not have an effect on the key. If
+one needed the key 'wp', they would simply omit the 'w' to get an equivalent
+key 'p'. This is so that no key becomes *unaccessable* in the terminal. Follow
+the 'wp' flag immediately (after a space) with a permutation of the hex digits
+0, 1, ..., 9, a, ..., f. There will be integrity checks to make sure that a
+bonafide permutation has been entered.
+
+Then, you can *optionally* specify a different 'mixer', which 'mixes up' the
+values that are passed into the codec to reduce the chances of cracking
+this engine by simple analysis of frequencies. These number generators have
+relatively low computational costs (as your messages usually don't get that
+long) and are treated mod 256 (the size of one byte). Although 'tribonacci' is
+chosen by default for no particular reason, you have the option to switch to
+using the fibonacci or lucas numbers too. The swap takes the format
+'-f=NAME' where NAME could be the prefix/initial segment of any of the three
+options. e.g.
+-f=f # selects Fibonacci
+-f=lucas # selects Lucas
+-f=tribon # selects Tribonacci (already selected by default)
+
+Lastly, you attach the text to encode or crypt to decode. In the case of
+decoding, you must encapsulate the crypt inside quotation marks. You will be
+warned if you don't do so and that action ends up being problematic. A message
+does not need to be entered if it is already copied on your clipboard after you
+turn on the global clipboard option (see next section), given that your current
+version of python has pyperclip installed.
+
+By the way, why do we enforce quotes on 'decode'? It's because we disabled
+space-sensitivity, allowing "e  3" and "e 3" to yield the same result,
+in the process breaking space sensitive crypts. Also, another way to include
+a space into an argument without quotes is by using "\ " (backslash space).
+It is an unintentional feature of the parser, but we may as well make use of it.
+
+Tip: The only quotes that the Encryptron terminal recognizes is the double
+quotes. This makes quoting slightly simpler. Use \" to escape the double quotes
+character when needed.
+
+ ____ ____ ____ ____ ____ _________ ____ ____ ____ ____ ____ ____ ____ ____
+||O |||t |||h |||e |||r |||       |||C |||o |||m |||m |||a |||n |||d |||s ||
+||__|||__|||__|||__|||__|||_______|||__|||__|||__|||__|||__|||__|||__|||__||
+|/__\|/__\|/__\|/__\|/__\|/_______\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|/__\|
+
+* To see how to use a specific command, try 'help <cmd>'
+
+* 'x' or 'exit' exits the terminal
+
+* To turn on global clipboard mode, use 'copy', which takes '0', '1', 'on', and
+'off' as input.
+e.g.
+
+copy on     # turns on global clipboard mode
+copy off    # turns off global clipboard mode
+
+Because not everyone wants the output to be automatically copied to their
+clipboard, it is not on by default. You need to add the string 'cc' at the end
+of an encode or decode query to have the result copied to clipboard.
+
+If you want to encode a normal string ending with 'cc', then just use quotes
+to encapsulate a portion of the string including 'cc'. If you just want to
+encode 'cc', then perhaps turn off copy mode.
+If copy mode is off and your query still ends with 'cc', it will be included
+in the encoded message but you will also be warned of the event.
+
+* To see what permutation a key would evaluate to, use 'ckey' or 'check-key'
+e.g.
+
+ckey SampleKey    # returns 0123bd58fa946c7e
+
+* To see if a permutation is valid, use 'p' or 'check-perm'
+e.g.
+
+p 192837ab4560fedc    # returns "The permutation '192837ab4560fedc' is valid"
